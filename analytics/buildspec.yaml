@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: "your-ecr-repo-name"
+    IMAGE_REPO_NAME: "coworkinbg-checkin"
     IMAGE_TAG: "latest"
 
 phases:
