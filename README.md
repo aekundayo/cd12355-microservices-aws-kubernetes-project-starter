@@ -212,4 +212,6 @@ Please provide up to 3 sentences for each suggestion. Additional content in your
 
 ## Configuring AWS CodeBuild with `buildspec.yml`
 
-The `buildspec.yml` file located in the `/analytics/` directory defines the build instructions for AWS CodeBuild. During AWS CodeBuild configuration. Specify this directory `analytics/buildspec.yml`
+CodeBuild is utilised to automatically build and push the coworking docker images to ECR The `buildspec.yml` file located in the `/analytics/` directory defines the build instructions for AWS CodeBuild. During AWS CodeBuild configuration. Specify this directory `analytics/buildspec.yml` select the build to trigger on docker push.
+
+![Coworking Space Diagram](screenshots/codebuild_setting.png "CODEBUILD WEBHOOK")
