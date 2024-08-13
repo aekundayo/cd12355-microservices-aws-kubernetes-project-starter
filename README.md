@@ -129,3 +129,87 @@ Please provide up to 3 sentences for each suggestion. Additional content in your
 ### Best Practices
 * Dockerfile uses an appropriate base image for the application being deployed. Complex commands in the Dockerfile include a comment describing what it is doing.
 * The Docker images use semantic versioning with three numbers separated by dots, e.g. `1.2.1` and  versioning is visible in the  screenshot. See [Semantic Versioning](https://semver.org/) for more details.
+
+
+### 3. Running the Analytics Application On AWS
+
+## Prerequisites
+
+1. **AWS IAM Permissions**:
+   - Ensure you have the necessary IAM permissions to create an EKS cluster.
+   - Verify your IAM identity with the following command:
+     ```bash
+     aws sts get-caller-identity
+     ```
+   - If you encounter credential errors, you'll need to configure your AWS settings.
+
+2. **AWS CLI Configuration**:
+   - Configure your AWS CLI by running:
+     ```bash
+     aws configure
+     ```
+   - Paste in your AWS credentials when prompted. If your current environment doesn’t allow pasting, you can run the command in a new terminal window.
+
+3. **Install `eksctl`**:
+   - If you haven't installed `eksctl`, follow the [installation guide](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html).
+
+4. **Ensure the latest versions of AWS CLI and Docker are installed**:
+   - For more information, see [Getting started with Amazon ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html).
+
+## Creating an EKS Cluster
+
+1. **Create the EKS Cluster**:
+   - Use `eksctl` to create your EKS cluster:
+     ```bash
+     eksctl create cluster --name <CLUSTER_NAME> --region us-east-1 --nodegroup-name my-nodes --node-type t3.small --nodes 1 --nodes-min 1 --nodes-max 2
+     ```
+   - This command will create an EKS cluster named `<CLUSTER_NAME>` in the `us-east-1` region with a node group named `my-nodes` using `t3.small` instances.
+
+2. **Update Kubeconfig**:
+   - After the EKS cluster is created, update your local `kubeconfig` file to configure access to the cluster:
+     ```bash
+     aws eks --region us-east-1 update-kubeconfig --name <CLUSTER_NAME>
+     ```
+
+
+
+4. **Apply YAML Configurations**:
+   - Apply the YAML configurations in the following order:
+     ```bash
+     kubectl apply -f pvc.yaml
+     kubectl apply -f pv.yaml
+     kubectl apply -f postgresql-deployment.yaml
+     ```
+
+## Building and Pushing Docker Images to AWS ECR
+
+1. **Authenticate Docker with AWS ECR**:
+   - Retrieve an authentication token and authenticate your Docker client to your registry:
+     ```bash
+     aws configure
+     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <AWS_ECR_URL>
+     ```
+   - **Note**: If you receive an error using the AWS CLI, ensure you have the latest version of the AWS CLI and Docker installed.
+
+2. **Build the Docker Image**:
+   - Build your Docker image using the following command:
+     ```bash
+     docker build -t coworking .
+     ```
+   - If the image has already been built, you can skip this step.
+
+3. **Tag the Docker Image**:
+   - Tag your image so you can push it to the AWS ECR repository:
+     ```bash
+     docker tag coworking:latest <AWS_ECR_URL>/coworking:latest
+     ```
+
+4. **Push the Docker Image**:
+   - Push the image to your AWS ECR repository:
+     ```bash
+     docker push <AWS_ECR_URL>/coworking:latest
+     ```
+
+## Configuring AWS CodeBuild with `buildspec.yml`
+
+The `buildspec.yml` file located in the `/analytics/` directory defines the build instructions for AWS CodeBuild. During AWS CodeBuild configuration. Specify this directory `analytics/buildspec.yml`
