@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: "coworkinggit config --global user.name “Abiodun Ekundayo”"
+    IMAGE_REPO_NAME: "coworking"
     IMAGE_TAG: "latest"
 
 phases:
